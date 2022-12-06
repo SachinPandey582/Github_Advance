@@ -50,20 +50,40 @@ jobs:
 
 
 
+  # deploy:
+  #    name: deploy
+  #    runs-on: ubuntu-latest
+  #    needs: build
+
+  #   steps:
+  #   - name: Download artifact
+  #     uses: actions/download-artifact@v2
+  #     with:
+  #     name: production-files
+  #     path: ./build
+    
+  #   - name: Deploy to github pages
+  #     uses: peaceiris/actions-gh-pages@v3
+  #     with:
+  #       github_token: ${secrets.GITTOKENSECRET}
+  #       publish_dir: ./build
+  # deployed job
+
   deploy:
-     name: deploy
-     runs-on: ubuntu-latest
-     needs: build
+    name: Deploy
+    # The os to run the job on
+    runs-on: ubuntu-latest
+    needs: build
 
     steps:
-    - name: Download artifact
-      uses: actions/download-artifact@v2
-      with:
-      name: production-files
-      path: ./build
-    
-    - name: Deploy to github pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${secrets.GITTOKENSECRET}
-        publish_dir: ./build
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: production-files
+          path: ./build
+
+      - name: Deploy to github pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{secrets.GITTOKENSECRET}}
+          publish_dir: ./build
