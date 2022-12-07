@@ -1,72 +1,58 @@
+
 name: counter_app
-# this means the commentout  and make sure to take care of the space
+#triggger (events)
+on: 
+  push :
 
-on:
-   push:
+  pull_request:
+    branches:
+      -master
 
-   pull_request:
-     branch:
-       -main
+# Use an array when using more than one event
+#on: [push, pull_request]
 
+#functions (what need to be done)
+jobs:
+  # build job
+  build:
+    # name of the job
+    name: Build
+    runs-on: ubuntu-latest
 
-   jobs:
-      build:
-      name: Build
-      runs-on: ubuntu-latest
- 
-        - name: Checkout Code
-          uses: actions/checkout@v3
-        - name: Install node 16
-          uses: actions/setup-node@v1
-          with:
-            node-version: 16.x
-        - name: Install NPM Dependencies
-          run: npm i
-        - name: Build Project
-          run: npm run build
-        - name: Upload artifact in order to deploy
-          uses: actions/upload-artifact@v2
-          with:
-            name: production-files
-            path: ./build
-          
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Install node 16
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - name: Install NPM Dependencies
+        run: npm i
+      - name: Build Project
+        run: npm run build
+      - name: Upload artifact in order to deploy
+        uses: actions/upload-artifact@v2
+        with:
+          name: production-files
+          path: ./build
 
+          # deployed job
 
+  deploy:
+    name: Deploy
+    # The os to run the job on
+    runs-on: ubuntu-latest
+    needs: build
 
-      deploy:
-        name: Deploy
-        # The os to run the job on
-            uses: actions/download-artifact@v2
-            with:
-              name: production-files
-              path: ./build
- 
-          - name: Deploy to github pages
-            uses: peaceiris/actions-gh-pages@v3
-            with:
-              github_token: ${{secrets.GITTOKENSECRET}}
-              publish_dir: ./build
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: production-files
+          path: ./build
 
-
-
-
-
-             
-  # deploy:
-  #    name: deploy
-  #    runs-on: ubuntu-latest
-  #    needs: build
-
-  #   steps:
-  #   - name: Download artifact
-  #     uses: actions/download-artifact@v2
-  #     with:
-  #     name: production-files
-  #     path: ./build
-    
-  #   - name: Deploy to github pages
-  #     uses: peaceiris/actions-gh-pages@v3
-  #     with:
-  #       github_token: ${secrets.GITTOKENSECRET}
-  #       publish_dir: ./build
-  # deployed job
+      - name: Deploy to github pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{secrets.GH_TOKEN}}
+          publish_dir: ./build
